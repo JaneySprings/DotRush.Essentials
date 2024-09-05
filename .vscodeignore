@@ -1,0 +1,13 @@
+# Ignore 
+*
+*/**
+**/.DS_Store
+
+# Include
+!assets/icon.png
+!extension
+!themes
+!package.json
+!package.nls*.json
+!README.md
+!LICENSE

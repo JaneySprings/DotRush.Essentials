@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "tsc: watch",
+            "command": "tsc",
+            "type": "shell",
+            "args": [
+                "-w",
+                "-p",
+                "${workspaceFolder}/src/typescript"
+            ],
+            "isBackground": true,
+            "problemMatcher": [
+                "$tsc-watch"
+            ]
+        },
+        {
+            "label": "vsix",
+            "command": "dotnet",
+            "type": "process",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "args": [
+                "cake",
+                "--target=vsix",
+                "--configuration=release"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
