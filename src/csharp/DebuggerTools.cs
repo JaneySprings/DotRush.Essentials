@@ -74,8 +74,7 @@ public static class DebuggerTools {
 
         using var archive = new ZipArchive(response.Content.ReadAsStream());
         foreach (var entry in archive.Entries) {
-            var assemblyFileName = entry.Name.TrimStart("lib_").TrimEnd(".so");
-            var targetPath = Path.Combine(extractPath, entry.Name);
+            var targetPath = Path.Combine(extractPath, entry.FullName);
             var targetDirectory = Path.GetDirectoryName(targetPath)!;
 
             if (!Directory.Exists(targetDirectory))
