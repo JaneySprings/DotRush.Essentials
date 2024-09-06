@@ -10,6 +10,8 @@ export const taskCommandIdBuild = "dotrush-essentials.build";
 export const taskCommandIdRestore = "dotrush-essentials.restore";
 export const taskCommandIdClean = "dotrush-essentials.clean";
 
+export const extendedViewIdModules = "dotrush-essentials.modulesView";
+
 export const microsoftProblemMatcherId = "msCompile";
 
 export const messageInstallingDebuggerTitle = "Installing .NET Core debugger";

@@ -126,6 +126,15 @@
         }
       ]
     },
+    "views": {
+      "debug": [
+        {
+          "id": "dotrush-essentials.modulesView",
+          "name": "Modules",
+          "when": "debugType == coreclr"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "dotrush-essentials.test",
