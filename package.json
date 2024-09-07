@@ -75,19 +75,35 @@
         ],
         "initialConfigurations": [
           {
-            "name": ".NET Core Debugger",
+            "name": ".NET Core Debugger (launch)",
             "type": "coreclr",
             "request": "launch"
+          },
+          {
+            "name": ".NET Core Debugger (attach)",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:dotrush-essentials.pickProcess}"
           }
         ],
         "configurationSnippets": [
           {
-            "label": ".NET Core Debugger",
+            "label": ".NET Core Debugger (launch)",
             "description": "Launch .NET Core Debugger",
             "body": {
-              "name": ".NET Core Debugger",
+              "name": ".NET Core Debugger (launch)",
               "type": "coreclr",
               "request": "launch"
+            }
+          },
+          {
+            "label": ".NET Core Debugger (attach)",
+            "description": "Attach .NET Core Debugger",
+            "body": {
+              "name": ".NET Core Debugger (attach)",
+              "type": "coreclr",
+              "request": "attach",
+              "processId": "^\"\\${command:dotrush-essentials.pickProcess}\""
             }
           }
         ],
@@ -96,6 +112,19 @@
             "properties": {
               "program": {
                 "type": "string"
+              },
+              "args": {
+                "type": "array"
+              }
+            }
+          },
+          "attach": {
+            "properties": {
+              "processId": {
+                "type": "string"
+              },
+              "args": {
+                "type": "array"
               }
             }
           }

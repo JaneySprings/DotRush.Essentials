@@ -31,10 +31,18 @@ public class Program {
             }
             SetResult(OperationStatus.Success());
         }
+
+        if (args[0] == "--list-proc") {
+            try {
+                SetResult(DebuggerTools.GetProcesses());
+            } catch {
+                SetResult(Enumerable.Empty<object>());
+            }
+        }
     }
 
-    private static void SetResult(OperationStatus status) {
-        Console.Out.WriteLine(JsonSerializer.Serialize(status));
+    private static void SetResult(object result) {
+        Console.Out.WriteLine(JsonSerializer.Serialize(result));
         Environment.Exit(0);
     }
 }

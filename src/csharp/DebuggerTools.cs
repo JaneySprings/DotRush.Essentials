@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -100,5 +102,9 @@ public static class DebuggerTools {
         var processInfo = ProcessRunner.CreateProcess("chmod", $"+x {executable}");
         var result = await processInfo.Result;
         return result.ExitCode == 0;
+    }
+
+    public static IEnumerable<ProcessModel> GetProcesses() {
+        return Process.GetProcesses().Select(it => new ProcessModel(it)).ToImmutableList();
     }
 }
