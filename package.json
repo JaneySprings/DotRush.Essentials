@@ -135,22 +135,22 @@
       "explorer/context": [
         {
           "command": "dotrush-essentials.test",
-          "group": "1_run@0",
+          "group": "dotnet@0",
           "when": "dotrush-essentials.contextMenuEnabled && (resourceFilename =~ /.*Tests.*/)"
         },
         {
           "command": "dotrush-essentials.build",
-          "group": "1_run@1",
+          "group": "dotnet@1",
           "when": "dotrush-essentials.contextMenuEnabled && (explorerResourceIsFolder || resourceExtname == .csproj)"
         },
         {
           "command": "dotrush-essentials.restore",
-          "group": "1_run@2",
+          "group": "dotnet@2",
           "when": "dotrush-essentials.contextMenuEnabled && (explorerResourceIsFolder || resourceExtname == .csproj)"
         },
         {
           "command": "dotrush-essentials.clean",
-          "group": "1_run@3",
+          "group": "dotnet@3",
           "when": "dotrush-essentials.contextMenuEnabled && (explorerResourceIsFolder || resourceExtname == .csproj)"
         }
       ]
