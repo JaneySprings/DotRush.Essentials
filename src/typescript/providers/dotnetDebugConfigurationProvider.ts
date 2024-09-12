@@ -11,6 +11,7 @@ export class DotNetDebugConfigurationProvider implements vscode.DebugConfigurati
 			config.name = res.debuggerVsdbgTitle;
 			config.type = res.debuggerVsdbgId;
 			config.request = 'launch';
+			config.preLaunchTask = `${res.extensionId}: Build`;
 		}
 
 		if (!config.program && config.request === 'launch')

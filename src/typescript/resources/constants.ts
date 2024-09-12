@@ -6,6 +6,7 @@ export const debuggerVsdbgTitle = ".NET Core Debugger";
 export const commandIdContextMenuEnabled = "dotrush-essentials.contextMenuEnabled";
 export const commandIdPickProcess = "dotrush-essentials.pickProcess";
 
+export const taskDefinitionId = "dotrush-essentials.task";
 export const taskCommandIdTest = "dotrush-essentials.test";
 export const taskCommandIdBuild = "dotrush-essentials.build";
 export const taskCommandIdRestore = "dotrush-essentials.restore";

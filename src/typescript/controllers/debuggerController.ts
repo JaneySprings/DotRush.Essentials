@@ -29,7 +29,7 @@ export class DebuggerController {
 
     public static async getProjectFile(): Promise<string | undefined> {
         if (vscode.window.activeTextEditor?.document === undefined) {
-            const projectFiles = await vscode.workspace.findFiles('*.csproj');
+            const projectFiles = await vscode.workspace.findFiles('**/*.csproj');
             return projectFiles.length === 1 ? projectFiles[0].fsPath : undefined;
         }
 

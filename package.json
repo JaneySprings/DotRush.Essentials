@@ -77,7 +77,8 @@
           {
             "name": ".NET Core Debugger (launch)",
             "type": "coreclr",
-            "request": "launch"
+            "request": "launch",
+            "preLaunchTask": "dotrush-essentials: Build"
           },
           {
             "name": ".NET Core Debugger (attach)",
@@ -93,7 +94,8 @@
             "body": {
               "name": ".NET Core Debugger (launch)",
               "type": "coreclr",
-              "request": "launch"
+              "request": "launch",
+              "preLaunchTask": "dotrush-essentials: Build"
             }
           },
           {
@@ -126,6 +128,21 @@
               "args": {
                 "type": "array"
               }
+            }
+          }
+        }
+      }
+    ],
+    "taskDefinitions": [
+      {
+        "type": "dotrush-essentials.task",
+        "required": [],
+        "properties": {
+          "args": {
+            "type": "array",
+            "default": [],
+            "items": {
+              "type": "string"
             }
           }
         }
