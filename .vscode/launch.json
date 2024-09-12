@@ -13,5 +13,10 @@
             ],
             "preLaunchTask": "tsc: watch"
         },
+        {
+            "name": ".NET Core Debugger (launch)",
+            "type": "coreclr",
+            "request": "launch"
+        }
     ]
 }

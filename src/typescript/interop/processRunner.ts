@@ -11,14 +11,18 @@ export class ProcessRunner {
         return result.stdout.toString().trimEnd();
     }
     public static async runAsync<TModel>(builder: ProcessArgumentBuilder): Promise<TModel> {
-        return new Promise<TModel>((resolve, reject) => {
+        const result = await ProcessRunner.runAsyncRaw(builder);
+        return JSON.parse(result);
+    }
+    public static async runAsyncRaw(builder: ProcessArgumentBuilder): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
             exec(builder.build(), (error, stdout, stderr) => {
                 if (error) {
                     console.error(stderr);
                     reject(stderr);
                 }
 
-                resolve(JSON.parse(stdout.toString()));
+                resolve(stdout.toString());
             })
         });
     }

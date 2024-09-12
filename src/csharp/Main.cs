@@ -16,20 +16,20 @@ public class Program {
             try {
                 var url = await DebuggerTools.GetDebuggerInstallLink();
                 if (string.IsNullOrEmpty(url))
-                    SetResult(OperationStatus.Failure("Cannot optain debugger download link"));
+                    SetResult(OperationResponse.Failure("Cannot optain debugger download link"));
 
                 var executable = await DebuggerTools.InstallDebugger(url!);
                 if (string.IsNullOrEmpty(executable))
-                    SetResult(OperationStatus.Failure("Cannot locate debugger executable"));
+                    SetResult(OperationResponse.Failure("Cannot locate debugger executable"));
 
                 var registerResult = await DebuggerTools.RegisterDebugger(executable!);
                 if (!registerResult)
-                    SetResult(OperationStatus.Failure("Cannot register debugger"));
+                    SetResult(OperationResponse.Failure("Cannot register debugger"));
 
             } catch (Exception ex) {
-                SetResult((OperationStatus.Failure(ex.Message)));
+                SetResult((OperationResponse.Failure(ex.Message)));
             }
-            SetResult(OperationStatus.Success());
+            SetResult(OperationResponse.Success());
         }
 
         if (args[0] == "--list-proc") {

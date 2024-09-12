@@ -28,34 +28,23 @@ export class DebuggerController {
     }
 
     public static async getProjectFile(): Promise<string | undefined> {
-        let workspaceFolder : vscode.WorkspaceFolder | undefined;
-        
-        if (vscode.window.activeTextEditor?.document.fileName.endsWith(".cs"))
-            workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri);
-        if (vscode.workspace.workspaceFolders !== undefined)
-            workspaceFolder ??= vscode.workspace.workspaceFolders[0];
-        if (workspaceFolder === undefined)
-            return undefined;
+        if (vscode.window.activeTextEditor?.document === undefined) {
+            const projectFiles = await vscode.workspace.findFiles('*.csproj');
+            return projectFiles.length === 1 ? projectFiles[0].fsPath : undefined;
+        }
 
-		const projectFiles = await vscode.workspace.findFiles(new vscode.RelativePattern(workspaceFolder, '*.csproj'));
-		if (projectFiles.length === 0 || projectFiles.length > 1)
-			return undefined;
-
-        return projectFiles[0].fsPath;
+        return DebuggerController.findProjectFile(path.dirname(vscode.window.activeTextEditor.document.fileName));
     }
     public static async getProgramPath(): Promise<string | undefined> {
         const projectFile = await DebuggerController.getProjectFile();
         if (projectFile === undefined)
             return await DebuggerController.pickProgramPath();
 
-		const programName = path.basename(projectFile, '.csproj') + '.dll';
-		const programBasePath = path.join(path.dirname(projectFile), 'bin', 'Debug');
-		const assemblyFiles = await vscode.workspace.findFiles(new vscode.RelativePattern(programBasePath, "**/*.dll"));
-        const programFiles = assemblyFiles.filter(asm => path.basename(asm.fsPath).toLowerCase() === programName.toLowerCase())
-		if (programFiles.length === 0 || programFiles.length > 1)
+        const programFile = await InteropController.getPropertyValue('TargetPath', projectFile);
+		if (!programFile)
 			return await DebuggerController.pickProgramPath();
 		
-		return programFiles[0].fsPath;
+		return programFile;
 	}
     
     public static async pickProgramPath(): Promise<string | undefined> {
@@ -71,5 +60,19 @@ export class DebuggerController {
         const processes = await InteropController.getProcesses();
         const selectedItem = await vscode.window.showQuickPick(processes.map(p => new ProcessItem(p)), { placeHolder: res.messageSelectProcessTitle });
         return selectedItem?.pid?.toString();
+    }
+
+    private static async findProjectFile(directory: string): Promise<string | undefined> {
+        const projectFiles = await vscode.workspace.findFiles(new vscode.RelativePattern(directory, '*.csproj'));
+		if (projectFiles.length > 1)
+			return undefined;
+        if (projectFiles.length === 1)
+            return projectFiles[0].fsPath;
+        
+        const parentDirectory = path.dirname(directory);
+        if (parentDirectory === directory)
+            return undefined;
+
+        return DebuggerController.findProjectFile(parentDirectory);
     }
 }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace DotRush.Essentials.Tools.Models;
 
-public class OperationStatus {
+public class OperationResponse {
     [JsonPropertyName("isSucceded")]
     public bool IsSucceded { get; set; }
 
@@ -13,11 +13,11 @@ public class OperationStatus {
     [JsonPropertyName("helpLink")]
     public string? HelpLink { get; set; }
 
-    public static OperationStatus Success() {
-        return new OperationStatus { IsSucceded = true };
+    public static OperationResponse Success() {
+        return new OperationResponse { IsSucceded = true };
     }
-    public static OperationStatus Failure(string message) {
-        return new OperationStatus {
+    public static OperationResponse Failure(string message) {
+        return new OperationResponse {
             Message = message,
             HelpLink = new Uri(Logging.LogConfig.DebugLogFile).AbsoluteUri
         };

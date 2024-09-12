@@ -23,4 +23,11 @@ export class InteropController {
             .appendQuoted(InteropController.workspaceToolPath)
             .append("--list-proc"));
     }
+    public static async getPropertyValue(propertyName: string, projectPath: string): Promise<string> {
+        return (await ProcessRunner.runAsyncRaw(new ProcessArgumentBuilder("dotnet")
+            .append("msbuild")
+            .append(`-getProperty:${propertyName}`)
+            .appendQuoted(projectPath)))
+            .trim();
+    }
 }
