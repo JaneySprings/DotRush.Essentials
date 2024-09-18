@@ -79,6 +79,8 @@ public static class DebuggerTools {
             var targetPath = Path.Combine(extractPath, entry.FullName);
             var targetDirectory = Path.GetDirectoryName(targetPath)!;
 
+            if (string.IsNullOrEmpty(Path.GetFileName(targetPath)))
+                continue;
             if (!Directory.Exists(targetDirectory))
                 Directory.CreateDirectory(targetDirectory);
 
