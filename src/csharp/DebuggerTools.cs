@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using DotRush.Essentials.Tools.Extensions;
 using DotRush.Essentials.Tools.External;
 using DotRush.Essentials.Tools.Logging;
 using DotRush.Essentials.Tools.Models;
@@ -39,20 +40,16 @@ public static class DebuggerTools {
             return null;
         }
 
-        var currentRuntimeId = RuntimeInformation.RuntimeIdentifier.Replace("win-", "win32-").Replace("osx-", "darwin-").Replace("-x64", "-x86_64");
-        var platformAndArch = currentRuntimeId.Split('-');
-        if (platformAndArch.Length != 2) {
-            CurrentSessionLogger.Error($"Incorrect runtimeId: {currentRuntimeId}");
-            return null;
-        }
+        var platform = RuntimeExtensions.GetOperationSystem();
+        var arch = RuntimeExtensions.GetArchitecture();
         
         var result = debuggers
-            .Where(d => d.Platforms.Contains(platformAndArch[0]) && d.Architectures.Contains(platformAndArch[1]))
+            .Where(d => d.Platforms.Contains(platform) && d.Architectures.Contains(arch))
             .OrderBy(d => d.Architectures.Count())
             .FirstOrDefault();
 
         if (result == null) {
-            CurrentSessionLogger.Error($"No suitable debugger found for {platformAndArch[0]}-{platformAndArch[1]}");
+            CurrentSessionLogger.Error($"No suitable debugger found for {platform}-{arch}");
             return null;
         }
 
