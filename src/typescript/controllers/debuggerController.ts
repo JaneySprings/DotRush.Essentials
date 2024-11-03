@@ -1,4 +1,4 @@
-import { InteropController } from './interopController';
+import { Interop } from './../interop/interop';
 import { ProcessItem } from '../models/processItem';
 import * as res from '../resources/constants';
 import * as vscode from 'vscode';
@@ -15,7 +15,7 @@ export class DebuggerController {
                 title: res.messageInstallingDebuggerTitle,
                 cancellable: false
             }, () => new Promise<void>(async (resolve) => {
-                const operationResult = await InteropController.installVsdbg();
+                const operationResult = await Interop.installVsdbg();
                 if (!operationResult.isSucceded) {
                     vscode.window.showErrorMessage(res.messageInstallingDebuggerFailed, { 
                         detail: operationResult.message,
@@ -40,7 +40,7 @@ export class DebuggerController {
         if (projectFile === undefined)
             return await DebuggerController.pickProgramPath();
 
-        const programFile = await InteropController.getPropertyValue('TargetPath', projectFile);
+        const programFile = await Interop.getPropertyValue('TargetPath', projectFile);
 		if (!programFile)
 			return await DebuggerController.pickProgramPath();
 		
@@ -57,7 +57,7 @@ export class DebuggerController {
         return programPath?.[0].fsPath;
     }
     public static async pickProcessId(): Promise<string | undefined> {
-        const processes = await InteropController.getProcesses();
+        const processes = await Interop.getProcesses();
         const selectedItem = await vscode.window.showQuickPick(processes.map(p => new ProcessItem(p)), { placeHolder: res.messageSelectProcessTitle });
         return selectedItem?.pid?.toString();
     }

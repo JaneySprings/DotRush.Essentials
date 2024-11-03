@@ -39,6 +39,23 @@ public class Program {
                 SetResult(Enumerable.Empty<object>());
             }
         }
+
+        if (args[0] == "--list-tests") {
+            try {
+                var tests = TestTools.DiscoverTests(args.Skip(1).ToArray());
+                SetResult(tests);
+            } catch {
+                SetResult(Enumerable.Empty<object>());
+            }
+        }
+        if (args[0] == "--parse-trx") {
+            try {
+                var result = TestTools.ProcessTrxFile(args[1]);
+                SetResult(result);
+            } catch {
+                SetResult(Enumerable.Empty<object>());
+            }
+        }
     }
 
     private static void SetResult(object result) {

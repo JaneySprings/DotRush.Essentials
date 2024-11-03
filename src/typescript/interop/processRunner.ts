@@ -26,4 +26,21 @@ export class ProcessRunner {
             })
         });
     }
+    public static async getResultAsync(builder: ProcessArgumentBuilder): Promise<ProcessResult> {
+        return new Promise<ProcessResult>((resolve, reject) => {
+            exec(builder.build(), (error, stdout, stderr) => {
+                resolve({
+                    isSucceded: error === null,
+                    stdout: stdout.toString(),
+                    stderr: stderr.toString()
+                });
+            })
+        });
+    }
+}
+
+export interface ProcessResult {
+    isSucceded: boolean;
+    stdout: string;
+    stderr: string;
 }

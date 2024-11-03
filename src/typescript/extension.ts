@@ -1,16 +1,19 @@
 import { DotNetDebugConfigurationProvider } from './providers/dotnetDebugConfigurationProvider';
 import { ContextMenuController } from './controllers/contextMenuController';
 import { DebuggerController } from './controllers/debuggerController';
-import { InteropController } from './controllers/interopController';
+import { TestController } from './controllers/testController';
 import { DotNetTaskProvider } from './providers/dotnetTaskProvider';
 import { ModulesView } from './features/modulesView';
+import { Interop } from './interop/interop';
 import * as res from './resources/constants';
 import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
-    InteropController.activate(context);
+    Interop.init(context.extensionPath);
+
     ContextMenuController.activate(context);
     DebuggerController.activate(context);
+    TestController.activate(context);
 
     ModulesView.feature.activate(context);
 
