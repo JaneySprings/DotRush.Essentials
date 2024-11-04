@@ -43,9 +43,9 @@ public static class TestTools {
         foreach (XmlNode testResult in testResults) {
             try {
                 result.Add(new TestResultModel {
-                    FullName = testResult.Attributes["testName"].Value,
                     State = testResult.Attributes["outcome"].Value,
                     Duration = testResult.Attributes["duration"].Value,
+                    FullName = RemoveTheoryData(testResult.Attributes["testName"].Value),
                     ErrorMessage = testResult.SelectSingleNode("*[local-name()='Output']/*[local-name()='ErrorInfo']/*[local-name()='Message']")?.InnerText,
                 });
             } catch (Exception e) {
@@ -68,6 +68,10 @@ public static class TestTools {
             }
         }
         return result;
+    }
+    private static string RemoveTheoryData(string fullName) {
+        var index = fullName.IndexOf('(', StringComparison.Ordinal);
+        return index > 0 ? fullName.Substring(0, index) : fullName;
     }
 }
 
@@ -111,7 +115,10 @@ public class TestDiscoverySyntaxWalker : CSharpSyntaxWalker {
 
     public override void VisitMethodDeclaration(MethodDeclarationSyntax node) {
         base.VisitMethodDeclaration(node);
-        if (node.AttributeLists.Any(p => p.Attributes.Any(a => a.Name.ToString().EndsWith("Fact")))) {
+        var hasFactAttribute = node.AttributeLists.Any(p => p.Attributes.Any(a => a.Name.ToString().EndsWith("Fact")));
+        var hasTheoryAttribute = node.AttributeLists.Any(p => p.Attributes.Any(a => a.Name.ToString().EndsWith("Theory")));
+        
+        if (hasFactAttribute) {
             var testModel = new TestModel {
                 Name = node.Identifier.Text,
                 FullName = $"{currentNamespace}.{currentClass}.{node.Identifier.Text}",
@@ -119,7 +126,20 @@ public class TestDiscoverySyntaxWalker : CSharpSyntaxWalker {
                 Range = GetRange(node)
             };
             currentFixture?.Children?.Add(testModel);
+            return;
         }
+
+        if (hasTheoryAttribute) {
+            var testModel = new TestModel {
+                Name = node.Identifier.Text + " [Theory]",
+                FullName = $"{currentNamespace}.{currentClass}.{node.Identifier.Text}",
+                FilePath = filePath,
+                Range = GetRange(node)
+            };
+            currentFixture?.Children?.Add(testModel);
+            return;
+        }
+
     }
 
     private Range GetRange(SyntaxNode node) {
