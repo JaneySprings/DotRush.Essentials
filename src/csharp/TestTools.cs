@@ -1,6 +1,4 @@
-
 using System.Xml;
-using DotRush.Essentials.Tools.Logging;
 using DotRush.Essentials.Tools.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -37,20 +35,20 @@ public static class TestTools {
         var doc = new XmlDocument();
         doc.Load(reportFilePath);
         var testResults = doc.GetElementsByTagName("UnitTestResult");
+        var tests = doc.GetElementsByTagName("UnitTest").Cast<XmlNode>().ToArray();
         if (testResults == null)
             return result;
 
         foreach (XmlNode testResult in testResults) {
-            try {
-                result.Add(new TestResultModel {
-                    State = testResult.Attributes["outcome"].Value,
-                    Duration = testResult.Attributes["duration"].Value,
-                    FullName = RemoveTheoryData(testResult.Attributes["testName"].Value),
-                    ErrorMessage = testResult.SelectSingleNode("*[local-name()='Output']/*[local-name()='ErrorInfo']/*[local-name()='Message']")?.InnerText,
-                });
-            } catch (Exception e) {
-                CurrentSessionLogger.Error(e);
-            }
+            if (testResult.Attributes == null)
+                continue;
+
+            result.Add(new TestResultModel {
+                State = testResult.Attributes["outcome"]?.Value,
+                Duration = testResult.Attributes["duration"]?.Value,
+                FullName = GetTestFullName(testResult.Attributes, tests),
+                ErrorMessage = testResult.SelectSingleNode("*[local-name()='Output']/*[local-name()='ErrorInfo']/*[local-name()='Message']")?.InnerText,
+            });
         }
         return result;
     }
@@ -69,7 +67,24 @@ public static class TestTools {
         }
         return result;
     }
-    private static string RemoveTheoryData(string fullName) {
+    private static string GetTestFullName(XmlAttributeCollection testNodeAttributes, XmlNode[] testNodes) {
+        var testId = testNodeAttributes["testId"]?.Value;
+        if (string.IsNullOrEmpty(testId))
+            return RemoveInlineData(testNodeAttributes["testName"]?.Value);
+
+        var testNode = testNodes.FirstOrDefault(p => p.Attributes?["id"]?.Value == testId);
+        var testMethod = testNode?.SelectSingleNode("*[local-name()='TestMethod']");
+        if (testMethod == null || testMethod.Attributes == null)
+            return RemoveInlineData(testNodeAttributes["testName"]?.Value);
+    
+        var testClassName = testMethod.Attributes["className"]?.Value;
+        var testName = testMethod.Attributes["name"]?.Value;
+        return RemoveInlineData($"{testClassName}.{testName}");
+    }
+    private static string RemoveInlineData(string? fullName) {
+        if (string.IsNullOrEmpty(fullName))
+            return string.Empty;
+
         var index = fullName.IndexOf('(', StringComparison.Ordinal);
         return index > 0 ? fullName.Substring(0, index) : fullName;
     }
@@ -115,10 +130,14 @@ public class TestDiscoverySyntaxWalker : CSharpSyntaxWalker {
 
     public override void VisitMethodDeclaration(MethodDeclarationSyntax node) {
         base.VisitMethodDeclaration(node);
+        // XUnit
         var hasFactAttribute = node.AttributeLists.Any(p => p.Attributes.Any(a => a.Name.ToString().EndsWith("Fact")));
         var hasTheoryAttribute = node.AttributeLists.Any(p => p.Attributes.Any(a => a.Name.ToString().EndsWith("Theory")));
+        // NUnit
+        var hasTestAttribute = node.AttributeLists.Any(p => p.Attributes.Any(a => a.Name.ToString().EndsWith("Test")));
+        var hasTestCaseAttribute = node.AttributeLists.Any(p => p.Attributes.Any(a => a.Name.ToString().EndsWith("TestCase")));
         
-        if (hasFactAttribute) {
+        if (hasFactAttribute || hasTestAttribute) {
             var testModel = new TestModel {
                 Name = node.Identifier.Text,
                 FullName = $"{currentNamespace}.{currentClass}.{node.Identifier.Text}",
@@ -129,9 +148,9 @@ public class TestDiscoverySyntaxWalker : CSharpSyntaxWalker {
             return;
         }
 
-        if (hasTheoryAttribute) {
+        if (hasTheoryAttribute || hasTestCaseAttribute) {
             var testModel = new TestModel {
-                Name = node.Identifier.Text + " [Theory]",
+                Name = node.Identifier.Text + " + Overloads",
                 FullName = $"{currentNamespace}.{currentClass}.{node.Identifier.Text}",
                 FilePath = filePath,
                 Range = GetRange(node)
@@ -142,7 +161,7 @@ public class TestDiscoverySyntaxWalker : CSharpSyntaxWalker {
 
     }
 
-    private Range GetRange(SyntaxNode node) {
+    private static Range GetRange(SyntaxNode node) {
         return new Range {
             Start = new Position {
                 Line = node.GetLocation().GetLineSpan().StartLinePosition.Line,
