@@ -84,7 +84,7 @@ export class TestController {
             .append("test").appendQuoted(root.uri!.fsPath)
             .append("--logger").appendQuoted(`trx;LogFileName=${testsResultFile}`)
             .conditional('--filter', () => filter !== undefined && filter !== '')
-            .conditional(filter, () => filter !== undefined && filter !== ''));
+            .conditional(`\"${filter}\"`, () => filter !== undefined && filter !== ''));
         
         if (!fs.existsSync(testsResultFile))
             return [];
@@ -96,7 +96,7 @@ export class TestController {
         const builder = new ProcessArgumentBuilder("dotnet")
             .append("test").appendQuoted(root.uri!.fsPath)
             .conditional('--filter', () => filter !== undefined && filter !== '')
-            .conditional(filter, () => filter !== undefined && filter !== '');
+            .conditional(`\"${filter}\"`, () => filter !== undefined && filter !== '');
 
         await vscode.tasks.executeTask(new vscode.Task(
             {type: "process"}, vscode.TaskScope.Workspace, 
